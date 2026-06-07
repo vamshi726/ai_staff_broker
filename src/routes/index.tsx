@@ -5,8 +5,8 @@ import { Mic, Languages, Users, Activity, ArrowRight } from "lucide-react";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Sahayak — Multilingual AI Workforce Supervisor" },
-      { name: "description", content: "Speak in your language. Sahayak's AI Supervisor turns voice instructions into translated tasks for every worker." },
+      { title: "AI Staff Broker — Multilingual AI Workforce Supervisor" },
+      { name: "description", content: "Speak in your language. AI Staff Broker's AI Supervisor turns voice instructions into translated tasks for every worker." },
     ],
   }),
   component: Landing,
@@ -21,7 +21,7 @@ function Landing() {
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
               <Mic className="h-4 w-4" />
             </div>
-            <span className="text-lg font-semibold tracking-tight">Sahayak</span>
+            <span className="text-lg font-semibold tracking-tight">AI Staff Broker</span>
           </div>
           <Link to="/auth">
             <Button variant="ghost" size="sm">Sign in</Button>
@@ -40,7 +40,7 @@ function Landing() {
             <span className="text-primary">in every language your team speaks.</span>
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground">
-            Speak instructions once. Sahayak breaks them into tasks, picks the right workers, and delivers translated voice instructions to each one — Telugu, Tamil, Hindi, Kannada, and more.
+            Speak instructions once. AI Staff Broker breaks them into tasks, picks the right workers, and delivers translated voice instructions to each one — Telugu, Tamil, Hindi, Kannada, and more.
           </p>
           <div className="mt-10 flex justify-center gap-3">
             <Link to="/auth">
@@ -75,7 +75,7 @@ function Landing() {
 
       <footer className="border-t">
         <div className="mx-auto max-w-6xl px-6 py-6 text-sm text-muted-foreground">
-          © {new Date().getFullYear()} Sahayak · Multilingual workforce coordination
+          © {new Date().getFullYear()} AI Staff Broker · Multilingual workforce coordination
         </div>
       </footer>
     </div>

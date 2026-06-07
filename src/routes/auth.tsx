@@ -20,8 +20,8 @@ import { LANGUAGES } from "@/lib/languages";
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Sign in · Sahayak" },
-      { name: "description", content: "Sign in to Sahayak to manage your multilingual workforce." },
+      { title: "Sign in · AI Staff Broker" },
+      { name: "description", content: "Sign in to AI Staff Broker to manage your multilingual workforce." },
     ],
   }),
   component: AuthPage,
@@ -108,7 +108,7 @@ function AuthPage() {
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
               <Mic className="h-4 w-4" />
             </div>
-            <span className="font-semibold tracking-tight">Sahayak</span>
+            <span className="font-semibold tracking-tight">AI Staff Broker</span>
           </Link>
         </div>
       </header>
