@@ -4,6 +4,8 @@ AI Staff Broker is a voice-first, AI-driven workforce coordination and task dele
 
 Supervisors can record and upload instructions in their native language. The system's **Agentic AI Pipeline** transcribes the audio, automatically breaks the instruction down into granular tasks, prioritizes them, matches them to the most suitable available workers based on skill tagging, translates the tasks into the workers' preferred languages, and generates synthetic voice instructions for playback.
 
+For a non-technical overview of the product, including a step-by-step user story and simple how-to-use instructions for managers and workers, check out the [Non-Technical User Guide](file:///c:/Users/vamsh/Downloads/lingua-task-main/lingua-task-main/docs/user_guide.md).
+
 ---
 
 ## 🏗️ System Architecture
