@@ -10,23 +10,9 @@ Supervisors can record and upload instructions in their native language. The sys
 
 AI Staff Broker is designed as a modern **full-stack SSR application** using the **TanStack Start** framework. It uses a serverless and real-time database architecture powered by **Supabase**.
 
-### Component Flow
-```mermaid
-graph TD
-    A[Supervisor Voice Input] -->|Uploads .webm / .wav| B(Supabase Storage Bucket: voice)
-    B -->|Trigger processing| C[Server Function: processVoiceCommand]
-    C -->|STT Transcription| D[Sarvam AI API saarika:v2.5]
-    D -->|Translate Transcript to English| E[Sarvam Translation API]
-    E -->|Decompose into Tasks & Tag Skills| F[Vercel AI SDK + LLM Gemini/OpenAI]
-    F -->|Match skills & availability| G[Smart Assignment Scoring Engine]
-    G -->|Translate task texts to Worker Lang| H[Sarvam Translation API]
-    H -->|Generate localized audio instruction| I[Sarvam TTS API]
-    I -->|Save task and localized audio| J[(Supabase DB: tasks / history)]
-    J -->|Realtime Subscriptions| K[Worker Dashboard - My Tasks]
-    K -->|Plays audio in native language| L[Worker Native Audio Playback]
-```
+### 1. Execution Sequence
+The sequence below illustrates the step-by-step transaction flow during a supervisor's voice command:
 
-### Execution Sequence
 ```mermaid
 sequenceDiagram
     autonumber
@@ -54,6 +40,62 @@ sequenceDiagram
     Server->>DB: Insert Tasks & History rows
     DB-->>Front: CDC Realtime update to dashboard
     Front->>Worker: Renders task in native language & plays audio
+```
+
+### 2. Agentic State Pipeline (LangGraph-style)
+This diagram illustrates the high-level workflow of the AI agent pipeline executing within the Server Function:
+
+```mermaid
+stateDiagram-v2
+    [*] --> IngestAudio : Upload voice instruction (.webm)
+    IngestAudio --> TranscribeTranslate : Transcribe & translate to English (Sarvam AI)
+    TranscribeTranslate --> TaskDecomposition : Decompose instruction into tasks, skills & priority (LLM)
+    TaskDecomposition --> SkillMatchEngine : Match task required skills to available workers (Scoring Engine)
+    SkillMatchEngine --> TaskLocalization : Translate tasks & generate voice files (.wav) for worker (Sarvam AI)
+    TaskLocalization --> DBCommit : Save tasks & audit history in database (Supabase)
+    DBCommit --> [*] : Broadcast updates in real-time (Postgres CDC)
+```
+
+### 3. System Component Architecture
+A simplified block diagram showing the layout of components and how data travels across client, storage, server, and external AI services:
+
+```mermaid
+graph LR
+    subgraph Client [Client Application (Browser)]
+        UI[Supervisor App Dashboard] -->|1. Record Voice| Mic[MediaRecorder Audio]
+        UI -->|8. Real-time Subscription| CDC[Postgres CDC Channel]
+        CDC -->|9. Render Tasks| WorkerUI[Worker Task Dashboard]
+    end
+
+    subgraph Storage [Supabase Storage]
+        Bucket[(voice Bucket - Public)]
+    end
+
+    subgraph Backend [Server Function (Backend Execution)]
+        Proc[processVoiceCommand]
+        Match[Skill Match Engine]
+        DB[Supabase Client]
+    end
+
+    subgraph AIService [AI Integration APIs]
+        STT[Sarvam STT saarika:v2.5]
+        Trans[Sarvam Translate]
+        TTS[Sarvam TTS]
+        LLM[Vercel AI SDK Gemini / OpenAI]
+    end
+
+    Mic -->|2. Upload WebM| Bucket
+    UI -->|3. Trigger server Fn| Proc
+    Proc -->|4. Download Audio| Bucket
+    Proc -->|5. Transcribe & Translate| STT
+    Proc -->|5. Translate| Trans
+    STT --> Trans
+    Proc -->|6. Decompose Tasks| LLM
+    Proc -->|7. Match Workers| Match
+    Match -->|Save task details| DB
+    Match -->|8. TTS Generation| TTS
+    TTS -->|Upload WAV| Bucket
+    DB -->|Postgres CDC| CDC
 ```
 
 ### Key Architectural Layers:
