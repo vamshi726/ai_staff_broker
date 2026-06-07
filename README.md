@@ -10,6 +10,7 @@ Supervisors can record and upload instructions in their native language. The sys
 
 AI Staff Broker is designed as a modern **full-stack SSR application** using the **TanStack Start** framework. It uses a serverless and real-time database architecture powered by **Supabase**.
 
+### Component Flow
 ```mermaid
 graph TD
     A[Supervisor Voice Input] -->|Uploads .webm / .wav| B(Supabase Storage Bucket: voice)
@@ -23,6 +24,36 @@ graph TD
     I -->|Save task and localized audio| J[(Supabase DB: tasks / history)]
     J -->|Realtime Subscriptions| K[Worker Dashboard - My Tasks]
     K -->|Plays audio in native language| L[Worker Native Audio Playback]
+```
+
+### Execution Sequence
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Supervisor
+    actor Worker
+    participant Front as Client App
+    participant Storage as Supabase Storage
+    participant Server as Server Function (processVoiceCommand)
+    participant AI as Sarvam & LLM APIs
+    participant DB as Supabase DB
+
+    Supervisor->>Front: Records spoken instruction
+    Front->>Storage: Uploads audio file (.webm)
+    Front->>Server: Calls processVoiceCommand(storagePath, language)
+    Server->>Storage: Downloads audio
+    Server->>AI: Transcribe (Sarvam STT) & Translate to English
+    AI-->>Server: English Transcript
+    Server->>AI: Decompose into Tasks (Gemini/OpenAI)
+    AI-->>Server: Structured Tasks (JSON)
+    Server->>DB: Fetch workers & match skills
+    DB-->>Server: Available best-match Worker
+    Server->>AI: Translate Task & TTS (Sarvam TTS)
+    AI-->>Server: Localized Audio
+    Server->>Storage: Uploads localized audio (.wav)
+    Server->>DB: Insert Tasks & History rows
+    DB-->>Front: CDC Realtime update to dashboard
+    Front->>Worker: Renders task in native language & plays audio
 ```
 
 ### Key Architectural Layers:
@@ -135,6 +166,10 @@ OPENAI_API_KEY="your_openai_api_key"
 ---
 
 ## 🚀 Getting Started & Local Development
+
+For a detailed walkthrough of environment variables setup, database migrations, and configuring Supabase settings, refer to the [Local Setup Guide](file:///c:/Users/vamsh/Downloads/lingua-task-main/lingua-task-main/docs/local_setup.md).
+
+### Quick Start:
 
 ### 1. Install Dependencies
 ```bash
