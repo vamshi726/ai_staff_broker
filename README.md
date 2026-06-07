@@ -16,7 +16,7 @@ The sequence below illustrates the step-by-step transaction flow during a superv
 ```mermaid
 sequenceDiagram
     autonumber
-    actor Supervisor
+    actor "Owner / Supervisor"
     actor Worker
     participant Front as Client App
     participant Storage as Supabase Storage
@@ -24,7 +24,7 @@ sequenceDiagram
     participant AI as Sarvam & LLM APIs
     participant DB as Supabase DB
 
-    Supervisor->>Front: Records spoken instruction
+    "Owner / Supervisor"->>Front: Records spoken instruction
     Front->>Storage: Uploads audio file (.webm)
     Front->>Server: Calls processVoiceCommand(storagePath, language)
     Server->>Storage: Downloads audio
@@ -47,7 +47,7 @@ This diagram illustrates the conditional logic, retries, and fallback strategies
 
 ```mermaid
 graph TD
-    Start([1. Start: Voice Upload]) --> STT[2. Call Sarvam STT saarika:v2.5]
+    Start([1. Start: Owner/Supervisor Voice Upload]) --> STT[2. Call Sarvam STT saarika:v2.5]
     
     STT -->|Success| LangCheck{3. Is Language English?}
     STT -->|Failure| STTRetry{STT Retry < 3?}
@@ -83,7 +83,7 @@ A simplified block diagram showing the layout of components and how data travels
 ```mermaid
 graph LR
     subgraph Client ["Client Application (Browser)"]
-        UI[Supervisor App Dashboard] -->|1. Record Voice| Mic[MediaRecorder Audio]
+        UI["Owner / Supervisor Dashboard"] -->|1. Record Voice| Mic[MediaRecorder Audio]
         UI -->|8. Real-time Subscription| CDC[Postgres CDC Channel]
         CDC -->|9. Render Tasks| WorkerUI[Worker Task Dashboard]
     end
