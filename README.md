@@ -43,17 +43,38 @@ sequenceDiagram
 ```
 
 ### 2. Agentic State Pipeline (LangGraph-style)
-This diagram illustrates the high-level workflow of the AI agent pipeline executing within the Server Function:
+This diagram illustrates the conditional logic, retries, and fallback strategies executed asynchronously within the Agent pipeline:
 
 ```mermaid
-stateDiagram-v2
-    [*] --> IngestAudio : Upload voice instruction (.webm)
-    IngestAudio --> TranscribeTranslate : Transcribe & translate to English (Sarvam AI)
-    TranscribeTranslate --> TaskDecomposition : Decompose instruction into tasks, skills & priority (LLM)
-    TaskDecomposition --> SkillMatchEngine : Match task required skills to available workers (Scoring Engine)
-    SkillMatchEngine --> TaskLocalization : Translate tasks & generate voice files (.wav) for worker (Sarvam AI)
-    TaskLocalization --> DBCommit : Save tasks & audit history in database (Supabase)
-    DBCommit --> [*] : Broadcast updates in real-time (Postgres CDC)
+graph TD
+    Start([1. Start: Voice Upload]) --> STT[2. Call Sarvam STT saarika:v2.5]
+    
+    STT -->|Success| LangCheck{3. Is Language English?}
+    STT -->|Failure| STTRetry{STT Retry < 3?}
+    STTRetry -->|Yes| STT
+    STTRetry -->|No| ErrorEnd([Terminate: Show Error Toast])
+    
+    LangCheck -->|No| TranslateEN[4. Translate Transcript to English]
+    LangCheck -->|Yes| LLM[5. Decompose Tasks - Vercel AI SDK]
+    TranslateEN --> LLM
+    
+    LLM -->|Success| Match[6. Skill Match Engine]
+    LLM -->|JSON Invalid| LLMRetry{LLM Retry < 3?}
+    LLMRetry -->|Yes| LLM
+    LLMRetry -->|No| ErrorEnd
+    
+    Match -->|Worker Found| WorkerLang[7. Translate Task to Worker Lang]
+    Match -->|No Worker Available| SavePending[8. Save Task as Pending]
+    
+    WorkerLang --> TTS[8. Generate Voice Instruction - Sarvam TTS]
+    TTS -->|Success| SaveAssigned[9. Save Task as Assigned + Audio URL]
+    TTS -->|TTS Failed| SaveAssignedNoAudio[9. Save Task as Assigned - Text Only]
+    
+    SaveAssigned --> DB[(10. Supabase Database)]
+    SaveAssignedNoAudio --> DB
+    SavePending --> DB
+    
+    DB -->|Real-time CDC| WorkerApp([11. Worker App Notification])
 ```
 
 ### 3. System Component Architecture
@@ -61,23 +82,23 @@ A simplified block diagram showing the layout of components and how data travels
 
 ```mermaid
 graph LR
-    subgraph Client [Client Application (Browser)]
+    subgraph Client ["Client Application (Browser)"]
         UI[Supervisor App Dashboard] -->|1. Record Voice| Mic[MediaRecorder Audio]
         UI -->|8. Real-time Subscription| CDC[Postgres CDC Channel]
         CDC -->|9. Render Tasks| WorkerUI[Worker Task Dashboard]
     end
 
-    subgraph Storage [Supabase Storage]
+    subgraph Storage ["Supabase Storage"]
         Bucket[(voice Bucket - Public)]
     end
 
-    subgraph Backend [Server Function (Backend Execution)]
+    subgraph Backend ["Server Function (Backend Execution)"]
         Proc[processVoiceCommand]
         Match[Skill Match Engine]
         DB[Supabase Client]
     end
 
-    subgraph AIService [AI Integration APIs]
+    subgraph AIService ["AI Integration APIs"]
         STT[Sarvam STT saarika:v2.5]
         Trans[Sarvam Translate]
         TTS[Sarvam TTS]
