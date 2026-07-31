@@ -1,0 +1,857 @@
+# Autonomous Revenue Leakage Detection Platform
+## AI-Powered Multi-Agent Financial Intelligence System
+
+**Duration:** 2 Months
+
+**Difficulty:** Advanced
+
+**Domain:** Finance / Enterprise AI
+
+**Architecture:** Multi-Agent AI + RAG + MCP + Event Driven
+
+---
+
+# 1. Executive Summary
+
+Revenue leakage is one of the largest hidden financial problems in enterprises.
+
+According to various industry reports, companies lose between **1%–5% of annual revenue** due to:
+
+- Incorrect pricing
+- Billing mistakes
+- Missed invoices
+- Contract violations
+- Duplicate discounts
+- Duplicate payments
+- Missed renewals
+- SLA compensation errors
+
+Most companies discover these issues months later during audits.
+
+The goal of this platform is to build an **Autonomous AI Finance Auditor** that continuously monitors enterprise financial data, identifies revenue leakage, explains the root cause, recommends corrective actions, and assists finance teams in recovering lost revenue.
+
+Unlike traditional rule-based systems, this platform uses **Agentic AI** where specialized AI agents collaborate to investigate financial anomalies autonomously.
+
+---
+
+# 2. Business Problem
+
+Large enterprises typically operate with:
+
+- ERP
+- CRM
+- Billing System
+- Contract Management
+- Payment Gateway
+- Accounting Software
+
+These systems often operate independently.
+
+Example:
+
+Customer Contract
+↓
+
+Salesforce
+
+Invoice
+
+↓
+
+SAP
+
+Payment
+
+↓
+
+Bank
+
+Support SLA
+
+↓
+
+ServiceNow
+
+Because these systems are disconnected, revenue leakage occurs.
+
+Examples:
+
+- Invoice never generated
+- Customer charged incorrect price
+- Wrong tax calculation
+- Duplicate discounts
+- Customer overpaid
+- Customer underpaid
+- Contract expired but billing continued
+- SLA penalties never deducted
+- Manual pricing overrides
+
+---
+
+# 3. Project Objectives
+
+Build an AI system capable of
+
+✔ Finding revenue leakage
+
+✔ Explaining why it happened
+
+✔ Calculating financial impact
+
+✔ Suggesting recovery strategy
+
+✔ Generating recovery workflow
+
+✔ Learning from previous cases
+
+---
+
+# 4. Users
+
+Finance Team
+
+Revenue Operations
+
+Accounting
+
+Business Analysts
+
+Auditors
+
+CFO
+
+Controllers
+
+---
+
+# 5. Business Benefits
+
+- Reduce manual auditing
+- Increase recovered revenue
+- Prevent future leakage
+- Reduce invoice processing time
+- Improve compliance
+- Reduce financial risk
+- Better executive visibility
+
+---
+
+# 6. System Architecture
+
+                          Dashboard
+
+                             │
+
+                     FastAPI Backend
+
+                             │
+
+                  LangGraph Orchestrator
+
+                             │
+
+        ┌────────────┬─────────────┬──────────────┐
+        │            │             │              │
+ Invoice Agent  Contract Agent Pricing Agent Payment Agent
+        │            │             │              │
+        └────────────┴─────────────┴──────────────┘
+                       │
+             Revenue Leakage Agent
+                       │
+              Recovery Recommendation
+                       │
+               Human Approval Agent
+                       │
+             Notification + Analytics
+
+---
+
+# 7. AI Agents
+
+## 7.1 Invoice Agent
+
+Responsibilities
+
+Read invoices
+
+Validate
+
+Find
+
+- Missing invoices
+- Duplicate invoices
+- Incorrect invoice amount
+- Wrong tax
+- Invoice delay
+
+Input
+
+ERP
+
+Output
+
+Invoice findings
+
+---
+
+## 7.2 Contract Agent
+
+Reads
+
+Customer contracts
+
+Checks
+
+- Contract value
+- Renewal
+- SLA
+- Discount clauses
+- Pricing terms
+- Expiration
+
+Outputs
+
+Contract summary
+
+---
+
+## 7.3 Pricing Agent
+
+Reads
+
+Price catalog
+
+Discount rules
+
+Dynamic pricing
+
+Checks
+
+Expected Price
+
+vs
+
+Actual Price
+
+Finds
+
+- Undercharging
+- Overcharging
+- Wrong discount
+
+---
+
+## 7.4 Payment Agent
+
+Reads
+
+Payment gateway
+
+Bank transactions
+
+Checks
+
+Invoice Paid?
+
+Duplicate payment?
+
+Outstanding balance?
+
+Refund issued?
+
+Chargeback?
+
+---
+
+## 7.5 SLA Agent
+
+Reads
+
+Support tickets
+
+Calculates
+
+Penalty
+
+Refund
+
+Credits
+
+Ensures billing follows SLA.
+
+---
+
+## 7.6 Revenue Leakage Agent
+
+Combines findings.
+
+Example
+
+Invoice Missing
+
++
+
+Contract Active
+
++
+
+Payment Received
+
+↓
+
+Revenue Leakage
+
+---
+
+## 7.7 Recovery Agent
+
+Suggests
+
+Generate Invoice
+
+Send Reminder
+
+Create Credit Note
+
+Refund Customer
+
+Escalate Finance
+
+Raise Ticket
+
+---
+
+## 7.8 Analytics Agent
+
+Creates
+
+Daily Reports
+
+Weekly Reports
+
+Executive Dashboard
+
+Revenue Saved
+
+Leakage Trends
+
+Department Analysis
+
+---
+
+# 8. Agent Workflow
+
+Customer Contract
+
+↓
+
+Invoice Agent
+
+↓
+
+Pricing Agent
+
+↓
+
+Payment Agent
+
+↓
+
+Contract Agent
+
+↓
+
+Revenue Leakage Agent
+
+↓
+
+Recovery Agent
+
+↓
+
+Finance Approval
+
+↓
+
+ERP Update
+
+↓
+
+Analytics Dashboard
+
+---
+
+# 9. AI Features
+
+## Multi-Agent Collaboration
+
+Agents communicate through LangGraph.
+
+## Tool Calling
+
+Agents use
+
+SQL
+
+ERP API
+
+CRM API
+
+Email
+
+Slack
+
+Excel
+
+PDF
+
+REST APIs
+
+---
+
+## Reflection
+
+Agent validates its own findings before final report.
+
+---
+
+## Memory
+
+Stores
+
+Recovered cases
+
+Failed investigations
+
+Historical leakage
+
+Customer history
+
+---
+
+## Planning
+
+Large investigations are broken into subtasks.
+
+---
+
+## Confidence Score
+
+Every finding
+
+85%
+
+92%
+
+99%
+
+---
+
+## Human Approval
+
+Required before
+
+Invoice changes
+
+Refunds
+
+Recovery emails
+
+ERP updates
+
+---
+
+# 10. RAG Knowledge Base
+
+Documents
+
+Finance SOP
+
+Pricing Policy
+
+Contract Templates
+
+Audit Reports
+
+Accounting Standards
+
+Tax Rules
+
+Invoice Guidelines
+
+Company Policies
+
+Embedding
+
+OpenAI Embeddings
+
+Vector DB
+
+Qdrant
+
+or
+
+Chroma
+
+---
+
+# 11. MCP Integrations
+
+GitHub
+
+Jira
+
+Slack
+
+PostgreSQL
+
+Google Drive
+
+Email
+
+Filesystem
+
+SAP APIs
+
+Salesforce
+
+---
+
+# 12. Dashboard
+
+Pages
+
+Dashboard
+
+Revenue Leakage
+
+Investigations
+
+Invoices
+
+Contracts
+
+Payments
+
+Recovery Queue
+
+Executive Analytics
+
+Settings
+
+---
+
+# 13. Dashboard Widgets
+
+Recovered Revenue
+
+Today's Leakage
+
+Top Customers
+
+Pending Recovery
+
+Recovery Success Rate
+
+Monthly Trend
+
+Department Breakdown
+
+Top Leakage Reasons
+
+---
+
+# 14. Investigation Screen
+
+Timeline
+
+Evidence
+
+Agent Reasoning
+
+Affected Records
+
+Financial Impact
+
+Recommendation
+
+Confidence
+
+Approval Button
+
+---
+
+# 15. Search
+
+Search by
+
+Invoice
+
+Customer
+
+Contract
+
+Payment
+
+Date
+
+Agent
+
+Recovery
+
+---
+
+# 16. Executive Dashboard
+
+KPIs
+
+Revenue Saved
+
+Revenue Lost
+
+Recovered Amount
+
+Pending Amount
+
+Average Investigation Time
+
+Top Leakage Types
+
+Recovery Success
+
+AI Accuracy
+
+---
+
+# 17. Notification System
+
+Slack
+
+Microsoft Teams
+
+Email
+
+Webhook
+
+Examples
+
+Revenue leakage detected
+
+Duplicate payment found
+
+Invoice missing
+
+Recovery completed
+
+---
+
+# 18. Recovery Workflow
+
+Leakage Found
+
+↓
+
+Finance Review
+
+↓
+
+Approve
+
+↓
+
+Generate Invoice
+
+↓
+
+Notify Customer
+
+↓
+
+ERP Updated
+
+↓
+
+Close Investigation
+
+---
+
+# 19. Database
+
+PostgreSQL
+
+Tables
+
+customers
+
+contracts
+
+pricing_rules
+
+products
+
+invoices
+
+payments
+
+discounts
+
+sla_records
+
+investigations
+
+recoveries
+
+agent_logs
+
+memory
+
+embeddings
+
+audit_logs
+
+---
+
+# 20. Tech Stack
+
+Frontend
+
+React
+
+TypeScript
+
+Material UI
+
+React Query
+
+React Flow
+
+Backend
+
+FastAPI
+
+Python
+
+LangGraph
+
+PydanticAI
+
+Celery
+
+Redis
+
+PostgreSQL
+
+AI
+
+OpenAI GPT-5 / GPT-4.1
+
+Embeddings
+
+RAG
+
+Tool Calling
+
+Structured Output
+
+Infrastructure
+
+Docker
+
+Docker Compose
+
+Kubernetes
+
+NGINX
+
+GitHub Actions
+
+Monitoring
+
+Langfuse
+
+OpenTelemetry
+
+Grafana
+
+Prometheus
+
+---
+
+# 21. Security
+
+JWT
+
+RBAC
+
+Audit Logs
+
+Encryption
+
+Secrets Manager
+
+Rate Limiting
+
+PII Masking
+
+Approval Workflow
+
+---
+
+# 22. Future Enhancements
+
+Fraud Detection
+
+Predictive Revenue Leakage
+
+Multi-Currency Support
+
+SAP Integration
+
+Oracle ERP Integration
+
+AI Voice Finance Assistant
+
+Autonomous Negotiation Agent
+
+Forecast Revenue Risk
+
+Root Cause Clustering
+
+Real-time Streaming Detection
+
+---
+
+# 23. Resume Impact
+
+This project demonstrates:
+
+- Multi-Agent AI Systems
+- Enterprise Workflow Automation
+- LangGraph Orchestration
+- Retrieval-Augmented Generation (RAG)
+- Model Context Protocol (MCP)
+- Human-in-the-Loop AI
+- Financial Intelligence
+- Event-Driven Architecture
+- FastAPI Backend Development
+- React Dashboard Development
+- PostgreSQL Database Design
+- Docker & Kubernetes Deployment
+- Observability with Langfuse and OpenTelemetry
+- AI Evaluation and Explainability
+- Production-Ready System Design
+
+---
+
+# 24. Success Metrics
+
+- Revenue recovered (₹)
+- Leakage detection accuracy (%)
+- False positive rate (%)
+- Mean investigation time
+- Recovery success rate
+- AI confidence calibration
+- Manual effort reduction
+- Finance team adoption
+- SLA compliance improvement
+- ROI generated
