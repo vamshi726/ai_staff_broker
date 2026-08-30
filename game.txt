@@ -1,0 +1,776 @@
+Yes. If you're going to give this to an AI coding tool like **Claude Code, Cursor, GitHub Copilot, or another code-generation AI**, use a prompt that defines the game rules, screens, backend, real-time behavior, and edge cases clearly.
+
+Here is a detailed copy-paste prompt.
+
+Build a production-quality browser-based multiplayer corporate HR team-building game called **“Fastest Finger: Guess the Person”**. The game combines a “Guess the Person” clue game with a real-time “Fastest Finger” buzzer system. It should be designed for global software-company teams and completed in approximately 10–15 minutes per session. The experience must be fun, professional, simple to understand, responsive, and polished.
+
+## 1. CORE GAME CONCEPT
+
+Players join a private game room using a short room code. Before the game starts, every player submits 3–5 fun, non-sensitive facts about themselves. The host starts the game. The system randomly selects one participant as the person to guess. The selected person’s submitted facts become clues.
+
+Each round:
+
+1. Display “WHO IS THIS PERSON?”
+2. Reveal clues progressively.
+3. Host opens the buzzer.
+4. Players press a large BUZZ button.
+5. Record the exact server-side order in which players buzzed.
+6. The fastest player gets the first opportunity to guess.
+7. Show the list of possible players.
+8. Player selects their answer.
+9. If correct, award points based on how early the clue was revealed and how quickly they buzzed.
+10. If incorrect, apply a small penalty and allow the next eligible fastest player to guess.
+11. Reveal the correct person.
+12. Show a short result animation and leaderboard.
+13. Continue to the next round.
+
+Default game: 10 rounds.
+
+## 2. PLAYER ROLES
+
+Implement two roles:
+
+### HOST
+
+The host:
+
+* Creates the game room.
+* Gets a unique room code.
+* Can configure number of rounds.
+* Can start the game.
+* Controls when clues are revealed.
+* Controls when the buzzer opens.
+* Can pause/continue the round.
+* Can skip a round if necessary.
+* Can end the game.
+* Can see all player scores.
+* Sees the live buzz order.
+* Sees game status.
+
+### PLAYER
+
+Players:
+
+* Join using room code.
+* Enter display name.
+* Submit fun facts before the game starts.
+* See the lobby.
+* See current clues.
+* Can press BUZZ when the buzzer is open.
+* Can submit a guess when it is their turn.
+* See their own score.
+* See round results.
+* See the final leaderboard.
+
+Do not expose private facts before they are intentionally revealed as clues.
+
+## 3. LOBBY
+
+Create a polished lobby screen.
+
+Host screen:
+
+* Game title
+* Room code displayed prominently
+* Copy room code button
+* Player count
+* List of joined players
+* Ready/submission status
+* Start Game button
+* Game settings
+
+Player screen:
+
+* Game title
+* Enter name
+* Join room
+* Fun-fact submission form
+* “Waiting for host” state
+
+Fun facts:
+
+* Minimum 3 facts
+* Maximum 5 facts
+* Each fact should have a reasonable character limit
+* Show examples:
+
+  * “I have visited 5 countries.”
+  * “I love playing badminton.”
+  * “I can speak three languages.”
+  * “I have never had coffee.”
+  * “I watched the same movie more than 10 times.”
+
+Do not allow sensitive personal information such as passwords, addresses, financial information, medical information, political information, etc.
+
+## 4. GAME FLOW
+
+Implement this state machine:
+
+LOBBY
+→ ROUND_START
+→ CLUE_REVEAL
+→ BUZZER_OPEN
+→ BUZZ_LOCKED
+→ GUESSING
+→ ROUND_RESULT
+→ NEXT_ROUND
+→ FINAL_RESULT
+
+Every game state must be synchronized through the backend.
+
+Never rely on the client clock or client-generated timestamps for determining the winner of a buzzer race.
+
+## 5. CLUE SYSTEM
+
+For each round:
+
+* Select one player as the target.
+* Randomly select/reorder their submitted facts.
+* Reveal one clue at a time.
+
+Example:
+
+ROUND 3 / 10
+
+WHO IS THIS PERSON?
+
+Clue 1:
+“This person loves travelling.”
+
+Then:
+
+Clue 2:
+“This person has visited more than 5 countries.”
+
+Then:
+
+Clue 3:
+“This person loves badminton.”
+
+Then:
+
+Clue 4:
+“This person can speak three languages.”
+
+Allow the host to reveal the next clue manually.
+
+Also provide an optional automatic mode where clues appear every 10–15 seconds.
+
+Do not reveal the target person's name until the round ends.
+
+## 6. FASTEST FINGER SYSTEM
+
+This is the most important feature.
+
+Display a large button:
+
+“🔴 BUZZ!”
+
+Before activation:
+
+“WAIT FOR THE BUZZER…”
+
+When activated:
+
+“BUZZ NOW!”
+
+The backend must accept the first valid buzz requests and record their server-side order.
+
+Example:
+
+1. Sarah — 10:42:03.182
+2. Vamshi — 10:42:03.247
+3. John — 10:42:03.401
+
+The server decides the order.
+
+Do NOT determine the winner using:
+
+* browser timestamps
+* client timestamps
+* animation timing
+* local JavaScript timers
+
+After buzzing:
+
+* Disable the player’s buzzer.
+* Show “You buzzed!”
+* Show their position.
+* The first eligible player receives the first guess opportunity.
+
+Prevent duplicate buzz requests.
+
+## 7. GUESSING SYSTEM
+
+After a player buzzes first:
+
+Show:
+
+“You buzzed first! Who do you think it is?”
+
+Display player names as selectable cards.
+
+Example:
+
+Sarah
+John
+Alex
+Priya
+David
+
+The guessing player gets 5–10 seconds to answer.
+
+If correct:
+
+* Award points.
+* End the round.
+
+If incorrect:
+
+* Deduct penalty points.
+* Mark that player as ineligible for the current round.
+* Give the guessing opportunity to the next fastest eligible player.
+
+Continue until:
+
+* Someone answers correctly, OR
+* All eligible players answer incorrectly, OR
+* The round timeout expires.
+
+The target person should not be allowed to buzz for their own round.
+
+## 8. SCORING
+
+Implement this default scoring model:
+
+Correct answer after clue 1: +100
+Correct answer after clue 2: +80
+Correct answer after clue 3: +60
+Correct answer after clue 4: +40
+
+Fastest buzz bonus: +10
+
+Incorrect answer: -25
+
+Optional:
+Second fastest buzz: +5 only if they eventually answer correctly.
+
+Prevent scores from going below zero unless explicitly configured.
+
+Make scoring rules configurable in one backend configuration file.
+
+## 9. ROUND RESULT
+
+After every round show:
+
+CORRECT PERSON:
+“Sarah”
+
+GUESS:
+“Vamshi guessed Sarah”
+
+RESULT:
+“CORRECT! 🎉”
+
+POINTS:
+“+80”
+
+Then show:
+
+Current Leaderboard
+
+1. Sarah — 420
+2. Vamshi — 380
+3. Alex — 320
+
+Automatically continue after a short delay or provide a “Next Round” button controlled by the host.
+
+## 10. FINAL LEADERBOARD
+
+After all rounds:
+
+Display a polished winner screen.
+
+Example:
+
+🏆 GAME COMPLETE
+
+🥇 Sarah — 820
+🥈 Vamshi — 760
+🥉 Alex — 690
+
+Winner title:
+“FASTEST FINGER CHAMPION”
+
+Add:
+
+* Confetti animation
+* Winner highlight
+* Final scores
+* Number of correct guesses
+* Number of fastest buzzes
+* Accuracy percentage
+
+Also show:
+“Play Again”
+“Return to Lobby”
+
+## 11. UI/UX
+
+Use a modern corporate design.
+
+Requirements:
+
+* Clean
+* Minimal
+* Professional
+* Fun but not childish
+* Responsive
+* Desktop-first but mobile-friendly
+* Large touch-friendly buttons
+* Clear typography
+* Strong visual hierarchy
+* Smooth transitions
+* Countdown animations
+* Buzzer animation
+* Confetti on winning
+* Toast notifications
+* Loading states
+* Empty states
+* Error states
+
+Use cards, rounded corners, subtle shadows, clear spacing, and accessible contrast.
+
+Do not overcrowd the UI.
+
+## 12. REQUIRED SCREENS
+
+Create these screens/components:
+
+1. Landing Page
+2. Create Game
+3. Join Game
+4. Host Lobby
+5. Player Lobby
+6. Fun Facts Form
+7. Game Instructions
+8. Clue Reveal Screen
+9. Buzzer Screen
+10. Guess Screen
+11. Round Result
+12. Live Leaderboard
+13. Final Winner Screen
+14. Error/Disconnected Screen
+
+## 13. GAME INSTRUCTIONS
+
+Before starting the first round show a short instruction screen:
+
+“HOW TO PLAY”
+
+1. Read the clues.
+2. Wait for the buzzer.
+3. Press BUZZ as quickly as possible.
+4. If you're first, guess the person.
+5. Earlier correct guesses earn more points.
+6. Wrong guesses lose points.
+7. Highest score wins.
+
+Keep this explanation under 30 seconds.
+
+## 14. REAL-TIME ARCHITECTURE
+
+Use real-time communication.
+
+Recommended architecture:
+
+Frontend:
+React
+TypeScript
+Vite
+
+Backend:
+Python
+FastAPI
+
+Real-time:
+WebSockets
+
+Database:
+PostgreSQL
+
+Optional:
+Redis for room state, pub/sub, and scalable real-time coordination.
+
+The backend should be authoritative for:
+
+* Room state
+* Player state
+* Round state
+* Clue state
+* Buzzer state
+* Buzz order
+* Guessing turn
+* Scores
+* Timers
+* Winner
+
+Use WebSocket events such as:
+
+GAME_CREATED
+PLAYER_JOINED
+PLAYER_LEFT
+FACTS_SUBMITTED
+GAME_STARTED
+ROUND_STARTED
+CLUE_REVEALED
+BUZZER_OPENED
+PLAYER_BUZZED
+GUESS_TURN
+GUESS_SUBMITTED
+GUESS_CORRECT
+GUESS_WRONG
+ROUND_FINISHED
+LEADERBOARD_UPDATED
+GAME_FINISHED
+GAME_RESET
+HOST_DISCONNECTED
+
+## 15. BACKEND API
+
+Create clean FastAPI routes.
+
+Example:
+
+POST /api/games
+POST /api/games/{room_code}/join
+POST /api/games/{room_code}/facts
+GET /api/games/{room_code}
+POST /api/games/{room_code}/start
+POST /api/games/{room_code}/next-round
+POST /api/games/{room_code}/open-buzzer
+POST /api/games/{room_code}/buzz
+POST /api/games/{room_code}/guess
+POST /api/games/{room_code}/end
+
+WebSocket:
+
+WS /ws/games/{room_code}
+
+Use Pydantic models for request/response validation.
+
+## 16. DATABASE MODELS
+
+Create appropriate models for:
+
+Game
+Player
+FunFact
+Round
+Clue
+Buzz
+Guess
+Score/Event
+
+Suggested relationships:
+
+Game
+├── Players
+├── Rounds
+│    ├── Clues
+│    ├── Buzzes
+│    └── Guesses
+└── Scores
+
+Use UUIDs internally.
+
+Use a short human-friendly room code externally.
+
+## 17. SECURITY AND VALIDATION
+
+Implement:
+
+* Unique room codes
+* Server-side authorization for host actions
+* Player session IDs
+* Input validation
+* Rate limiting for buzz requests
+* Duplicate request prevention
+* Maximum room size
+* Maximum fact length
+* Sanitization of user-generated text
+* WebSocket authentication/session validation
+* Prevent players from guessing before their turn
+* Prevent players from buzzing before buzzer activation
+* Prevent the target player from buzzing
+* Prevent clients from modifying scores
+* Prevent clients from modifying round state
+
+The frontend must never be trusted for game-critical decisions.
+
+## 18. DISCONNECTION HANDLING
+
+Handle:
+
+* Player refresh
+* Player disconnect
+* Host disconnect
+* Reconnection
+* Network interruption
+
+If a player disconnects:
+
+* Preserve their score.
+* Mark them temporarily offline.
+* Allow reconnection using their session ID.
+
+If the host disconnects:
+
+* Show an appropriate message.
+* Either allow host reconnection or safely terminate the game.
+
+## 19. GLOBAL TEAM SUPPORT
+
+The game should work for international teams.
+
+Use:
+
+* UTC internally for timestamps
+* Server-side timing for game events
+* No location-specific assumptions
+* Unicode-safe player names
+* Different time zones should not affect game logic
+
+Avoid culturally sensitive or personally invasive questions.
+
+## 20. ACCESSIBILITY
+
+Include:
+
+* Keyboard support
+* Visible focus states
+* Accessible buttons
+* ARIA labels where appropriate
+* Good color contrast
+* Do not rely only on color to communicate game state
+* Screen-reader-friendly labels
+
+The buzzer should work with keyboard interaction as well as mouse/touch.
+
+## 21. RESPONSIVENESS
+
+Desktop:
+Optimized for Zoom/Teams/Meet screen sharing.
+
+Mobile:
+A player should be able to join using their phone browser and use the buzzer comfortably.
+
+The host interface can be desktop-focused.
+
+## 22. GAME SETTINGS
+
+Allow host to configure:
+
+Number of rounds:
+5 / 10 / 15
+
+Clue mode:
+Manual / Automatic
+
+Clue interval:
+10 / 15 / 20 seconds
+
+Guess timeout:
+5 / 10 seconds
+
+Maximum players:
+10 / 20 / 30
+
+Scoring:
+Default / Custom
+
+## 23. HOST CONTROLS
+
+Host should have a control panel:
+
+Current Round
+Players
+Scores
+Current Target
+Current Clue
+Buzzer Status
+
+Buttons:
+
+[Reveal Clue]
+[Open Buzzer]
+[Close Buzzer]
+[Skip Round]
+[Next Round]
+[Pause]
+[End Game]
+
+Do not show the target person's identity to players until the round result.
+
+## 24. ANIMATIONS
+
+Add subtle animations:
+
+* Countdown: 3 → 2 → 1
+* Buzzer opens with pulse animation
+* First buzzer gets highlighted
+* Correct answer celebration
+* Wrong answer feedback
+* Score increment animation
+* Leaderboard movement animation
+* Final winner confetti
+
+Keep animations lightweight and avoid distracting effects.
+
+## 25. PROJECT STRUCTURE
+
+Use a clean production-style structure.
+
+Frontend:
+
+src/
+components/
+pages/
+hooks/
+services/
+types/
+utils/
+websocket/
+store/
+animations/
+
+Backend:
+
+app/
+main.py
+api/
+models/
+schemas/
+services/
+websocket/
+game/
+database/
+core/
+utils/
+
+Separate:
+
+* API layer
+* WebSocket layer
+* Game engine
+* Database layer
+* Business logic
+* Validation
+
+Do not put all game logic inside route handlers.
+
+## 26. GAME ENGINE
+
+Create a dedicated game engine/service responsible for:
+
+create_game()
+join_game()
+submit_facts()
+start_game()
+start_round()
+reveal_clue()
+open_buzzer()
+register_buzz()
+start_guess()
+submit_guess()
+calculate_score()
+finish_round()
+start_next_round()
+finish_game()
+
+The game engine should enforce valid state transitions.
+
+Example:
+
+BUZZER_OPEN
+→ PLAYER_BUZZED
+→ GUESSING
+
+A player must not be able to call submit_guess() unless they currently have the guessing turn.
+
+## 27. TESTING
+
+Write tests for:
+
+* Game creation
+* Joining
+* Duplicate names
+* Fact validation
+* Game start
+* Target selection
+* Clue ordering
+* Buzzer opening
+* First buzz determination
+* Simultaneous buzz requests
+* Duplicate buzz
+* Target player attempting to buzz
+* Incorrect guess
+* Correct guess
+* Score calculation
+* Round completion
+* Game completion
+* Reconnection
+* Host authorization
+
+Most importantly, create a concurrency test where multiple players send buzz requests nearly simultaneously and verify that the server determines exactly one valid first buzzer.
+
+## 28. DEMO DATA
+
+Create a development/demo mode with 8–10 fake players and realistic fun facts so the game can be tested without requiring multiple real users.
+
+Include a “Demo Game” option in development mode only.
+
+## 29. README
+
+Create a detailed README containing:
+
+* Project overview
+* Features
+* Architecture
+* Tech stack
+* Folder structure
+* Environment variables
+* Database setup
+* Redis setup if used
+* Backend setup
+* Frontend setup
+* WebSocket architecture
+* How to run locally
+* How to run multiple players
+* Testing instructions
+* Production deployment instructions
+
+Include .env.example files.
+
+## 30. DEVELOPMENT APPROACH
+
+Do not generate a fake static prototype.
+
+Build a functioning multiplayer application with real backend state and WebSocket communication.
+
+First implement the complete game engine and WebSocket protocol. Then build the frontend screens around that protocol.
+
+Prioritize correctness of the real-time buzzer system over visual complexity.
+
+Use TypeScript strictly on the frontend and Pydantic models/type-safe schemas on the backend.
+
+Avoid unnecessary dependencies.
+
+Make the application easy to extend later with additional HR games such as:
+
+* Would You Rather
+* Emoji Guess
+* Trivia
+* Office Bingo
+
+The final result should feel like a polished internal corporate team-building product that an HR team can open in a browser, create a room, share the room code with a global team, and complete a fun 10–15 minute game without requiring any installation.
